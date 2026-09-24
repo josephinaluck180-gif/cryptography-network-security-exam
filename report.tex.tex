@@ -1,0 +1,72 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+\title{Integrated Security Implementation Report \\ \large Module: ETTCS801 Cryptography and Network Security}
+\author{Josephine Laker}
+\date{September 25, 2026}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Introduction and Risk Assessment}
+A comprehensive baseline security audit revealed critical vulnerabilities at the ULK Polytechnic server architecture. This section outlines our systematic analysis and mitigation schema.
+
+\subsection{Risk Matrix and Controls}
+\begin{table}[h!]
+\small
+\centering
+\caption{Asset, Vulnerability, and Control Realignment}
+\begin{tabular}{p{3.5cm}p{4cm}p{3cm}p{4.5cm}}
+\toprule
+\textbf{Asset} & \textbf{Vulnerability} & \textbf{Risk Level} & \textbf{Recommended Control} \\
+\midrule
+Student Records DB & Guest network accessibility & Critical (Rank 1) & VLAN isolation \& firewall drops \\
+Data in Transit & Unencrypted pipeline links & High (Rank 3) & Deploy TLS/SFTP protocol layers \\
+Central Server Admin & Outdated software / Weak credentials & High (Rank 2) & Policy configuration, MFA \& patching \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Cryptography Application Engine}
+A dedicated tool engine was built using Python's core processing primitives. This ensures symmetric file protection mapped with data verification checks.
+
+\subsection{Integrity Verification Logic}
+Data state is strictly checked utilizing the SHA-256 standard cryptographic hashing primitives to detect unauthorized subsequent modifications.
+\begin{lstlisting}[language=Python, caption=SHA-256 Verification Extraction Block]
+def calculate_sha256(filename):
+    sha256_hash = hashlib.sha256()
+    with open(filename, "rb") as f:
+        for byte_block in iter(lambda: f.read(4096), b""):
+            sha256_hash.update(byte_block)
+    return sha256_hash.hexdigest()
+\end{lstlisting}
+
+\section{Network Traffic Control Optimization}
+Traffic isolation constraints are processed dynamically through kernel state-level rule configurations via the host Netfilter daemon subsystem.
+
+\subsection{Rule Matrices Configured}
+\begin{lstlisting}[language=bash]
+sudo iptables -A INPUT -s 192.168.20.0/24 -d 192.168.1.100 -j DROP
+sudo iptables -A INPUT -p tcp -s 192.168.10.0/24 --dport 5432 -j ACCEPT
+sudo iptables -A INPUT -p tcp --dport 5432 -j DROP
+\end{lstlisting}
+
+\section{Conclusion and Deliverables}
+The defenses applied isolate institutional records successfully from multi-vector compromise threats. Encryption guarantees data-at-rest protection, while strict firewall parameters close out architectural access leaks.
+
+\subsection{Repository Reference Location}
+\textbf{GitHub Production Link:} \url{https://github.com}
+
+\end{document}
