@@ -4,7 +4,7 @@ import sys
 import hashlib
 
 def calculate_sha256(filename):
-    """Calculates the SHA-256 hash of a file to check for changes."""
+    """Calculates SHA-256 hash for file integrity verification."""
     sha256_hash = hashlib.sha256()
     try:
         with open(filename, "rb") as f:
@@ -12,28 +12,46 @@ def calculate_sha256(filename):
                 sha256_hash.update(byte_block)
         return sha256_hash.hexdigest()
     except FileNotFoundError:
-        print(f"[-] Error: The file '{filename}' was not found.")
+        print(f"[-] Error: File '{filename}' not found.")
         return None
+
+def xor_cipher(input_file, output_file, key_byte=165):
+    """Encrypts or decrypts a file using a symmetric key stream byte."""
+    try:
+        with open(input_file, "rb") as f:
+            data = f.read()
+        # Perform symmetric byte manipulation
+        processed_data = bytes([b ^ key_byte for b in data])
+        with open(output_file, "wb") as f:
+            f.write(processed_data)
+        print(f"[+] Processed: '{input_file}' -> '{output_file}' successfully.")
+    except FileNotFoundError:
+        print(f"[-] Error: Target file '{input_file}' missing.")
     except Exception as e:
-        print(f"[-] Error tracking file: {str(e)}")
-        return None
+        print(f"[-] Error processing file operations: {str(e)}")
 
 def main():
     if len(sys.argv) < 3:
-        print("ULK Security Toolkit")
-        print("Usage: python3 toolkit.py hash [filename]")
-        print("Example: python3 toolkit.py hash risk_assessment.md")
+        print("--- ULK Security Toolkit ---")
+        print("Usage:")
+        print("  python toolkit.py encrypt [input_file] [output_file]")
+        print("  python toolkit.py decrypt [input_file] [output_file]")
+        print("  python toolkit.py hash [filename]")
         sys.exit(1)
 
     action = sys.argv[1].lower()
-    target_file = sys.argv[2]
-
-    if action == "hash":
-        file_hash = calculate_sha256(target_file)
+    
+    if action in ["encrypt", "decrypt"]:
+        if len(sys.argv) < 4:
+            print("[-] Error: Missing output file path argument.")
+            sys.exit(1)
+        xor_cipher(sys.argv[2], sys.argv[3])
+    elif action == "hash":
+        file_hash = calculate_sha256(sys.argv[2])
         if file_hash:
             print(f"[+] SHA-256 Integrity Hash: {file_hash}")
     else:
-        print("[-] Invalid action. Use 'hash'.")
+        print("[-] Invalid action command parameter. Use hash, encrypt, or decrypt.")
 
 if __name__ == "__main__":
     main()
